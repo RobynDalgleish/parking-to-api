@@ -21,17 +21,22 @@ micronaut {
 }
 
 dependencies {
-    annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("io.micronaut.openapi:micronaut-openapi")
-    implementation("io.micronaut:micronaut-validation")
-    implementation("io.micronaut:micronaut-runtime")
-    implementation("javax.annotation:javax.annotation-api")
-    implementation("io.micronaut:micronaut-http-client")
-    implementation("io.swagger.core.v3:swagger-annotations")
+    annotationProcessor(
+            "org.projectlombok:lombok",
+            "io.micronaut.openapi:micronaut-openapi",
+    )
     compileOnly("org.projectlombok:lombok")
-    implementation("io.micronaut:micronaut-management")
-    implementation("io.micronaut.elasticsearch:micronaut-elasticsearch")
-    implementation("io.micronaut.reactor:micronaut-reactor")
+    implementation(
+            "io.micronaut:micronaut-validation",
+            "io.micronaut:micronaut-runtime",
+            "javax.annotation:javax.annotation-api",
+            "io.micronaut:micronaut-http-client",
+            "io.swagger.core.v3:swagger-annotations",
+            "io.micronaut:micronaut-management",
+            "io.micronaut.elasticsearch:micronaut-elasticsearch",
+            "io.micronaut.reactor:micronaut-reactor",
+            "com.opencsv:opencsv:5.3",
+    )
     runtimeOnly("ch.qos.logback:logback-classic")
 }
 
