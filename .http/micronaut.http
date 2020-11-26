@@ -1,0 +1,13 @@
+GET http://localhost:8080/health
+
+###
+
+GET http://localhost:8080/info
+
+###
+
+GET http://localhost:8080/env
+
+###
+
+GET http://localhost:8080/beans

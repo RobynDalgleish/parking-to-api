@@ -1,4 +1,17 @@
 micronaut:
   application:
     name: parkingToApi
-elasticsearch.httpHosts: '"http://localhost:9200,http://127.0.0.2:9200"'
+
+info:
+  version: ${project.version}
+
+endpoints:
+  health:
+    sensitive: false
+    details-visible: anonymous
+  info:
+    sensitive: false
+  env:
+    sensitive: false
+  beans:
+    sensitive: false
