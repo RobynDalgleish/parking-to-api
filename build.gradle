@@ -38,6 +38,14 @@ dependencies {
             "com.opencsv:opencsv:5.3",
     )
     runtimeOnly("ch.qos.logback:logback-classic")
+    testImplementation(
+            "org.testcontainers:testcontainers:1.15.0",
+            "org.testcontainers:junit-jupiter:1.15.0",
+            "org.testcontainers:elasticsearch:1.15.0",
+            "org.assertj:assertj-core:3.9.0",
+            "org.mockito:mockito-core:2.23.4",
+            "org.mockito:mockito-junit-jupiter:2.23.4",
+    )
 }
 
 
