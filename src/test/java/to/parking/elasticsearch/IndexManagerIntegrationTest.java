@@ -1,6 +1,7 @@
 package to.parking.elasticsearch;
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -17,7 +18,10 @@ import to.parking.app.Clock;
 
 import java.time.OffsetDateTime;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.elasticsearch.client.RequestOptions.DEFAULT;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.mock;
@@ -27,14 +31,13 @@ import static org.mockito.Mockito.when;
 @TestInstance(PER_CLASS)
 class IndexManagerIntegrationTest {
 
-    IndexManager indexManager;
-    RestHighLevelClient restHighLevelClient;
-
     @Container
     // TODO: expose a random port; right now its set to a 9200/9300 default
     private static final ElasticsearchContainer esContainer = new ElasticsearchContainer(
         DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch").withTag("7.9.3")
     ).withExposedPorts(9200);
+    IndexManager indexManager;
+    RestHighLevelClient restHighLevelClient;
 
     @BeforeEach
     public void setUp() {
@@ -50,7 +53,7 @@ class IndexManagerIntegrationTest {
     @Test
     @DisplayName("A new index is created with appropriate settings")
     public void indexIsCreatedWithAppropriateSettings() throws Exception {
-        var indexName = indexManager.prepareNewIndex();
+        var indexName = indexManager.createNewIndex();
         var settingRequest = new GetSettingsRequest().indices(indexName);
         Settings settings = restHighLevelClient.indices().getSettings(settingRequest, DEFAULT).getIndexToSettings().get(indexName);
         assertThat(settings.get("index.number_of_shards")).isEqualTo("1");
@@ -61,7 +64,25 @@ class IndexManagerIntegrationTest {
     @Test
     @DisplayName("Creates predictable unique index name")
     public void createsPredictableUniqueIndexName() throws Exception {
-        var indexName = indexManager.prepareNewIndex();
+        var indexName = indexManager.createNewIndex();
         assertThat(indexName).isEqualTo("to-parking-20201130221108");
+    }
+
+    @Test
+    void createsAliasWhenPublishingIfAliasDoesNotAlreadyExist() throws Exception {
+
+        var indexName = indexManager.createNewIndex();
+
+        indexManager.refreshAndPublishIndex(indexName);
+
+        var aliasesResponse = await()
+            .pollInterval(500, MILLISECONDS)
+            .atMost(5, SECONDS)
+            .until(
+                () -> restHighLevelClient.indices().getAlias(new GetAliasesRequest("to-parking"), DEFAULT),
+                getAliasesResponse -> getAliasesResponse.getError() == null
+            );
+
+        assertThat(aliasesResponse.getAliases()).containsOnlyKeys(indexName);
     }
 }
