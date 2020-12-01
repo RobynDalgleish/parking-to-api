@@ -55,6 +55,7 @@ class IndexManagerIntegrationTest {
         Settings settings = restHighLevelClient.indices().getSettings(settingRequest, DEFAULT).getIndexToSettings().get(indexName);
         assertThat(settings.get("index.number_of_shards")).isEqualTo("1");
         assertThat(settings.get("index.number_of_replicas")).isEqualTo("0");
+        assertThat(settings.get("index.refresh_interval")).isEqualTo("-1");
     }
 
     @Test

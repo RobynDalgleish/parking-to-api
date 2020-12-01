@@ -35,6 +35,7 @@ class IndexManager {
         request.settings(Settings.builder()
             .put("index.number_of_shards", NUMBER_OF_SHARDS)
             .put("index.number_of_replicas", NUMBER_OF_REPLICAS)
+            .put("index.refresh_interval", -1)
             .build()
         );
         return esClient.indices().create(request, DEFAULT).index();
