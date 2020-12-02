@@ -8,6 +8,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import to.parking.app.Indexer;
 import to.parking.core.ParkingData;
+import to.parking.core.ParkingSpot;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,11 +21,17 @@ public class ElasticsearchIndexer implements Indexer {
 
     private final RestHighLevelClient restHighLevelClient;
     private final IndexManager indexManager;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public ElasticsearchIndexer(RestHighLevelClient restHighLevelClient, IndexManager indexManager) {
+    public ElasticsearchIndexer(
+        RestHighLevelClient restHighLevelClient,
+        IndexManager indexManager,
+        ObjectMapper objectMapper
+    ) {
         this.restHighLevelClient = restHighLevelClient;
         this.indexManager = indexManager;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -33,9 +40,8 @@ public class ElasticsearchIndexer implements Indexer {
             var indexName = indexManager.createNewIndex();
             BulkProcessor bulkProcessor = createBulkProcessor();
 
-            var mapper = new ObjectMapper();
             parkingData.read()
-                .map(parkingSpot -> convertToIndexRequest(indexName, mapper, parkingSpot))
+                .map(parkingSpot -> convertToIndexRequest(indexName, parkingSpot))
                 .forEach(bulkProcessor::add);
             bulkProcessor.awaitClose(1, TimeUnit.MINUTES);
 
@@ -46,12 +52,12 @@ public class ElasticsearchIndexer implements Indexer {
         }
     }
 
-    private IndexRequest convertToIndexRequest(String indexName, ObjectMapper mapper, to.parking.core.ParkingSpot parkingSpot) {
+    private IndexRequest convertToIndexRequest(String indexName, ParkingSpot parkingSpot) {
         // TODO: add validation maybe for null ids
         try {
             return new IndexRequest(indexName)
                 .id(String.valueOf(parkingSpot.getId()))
-                .source(mapper.writeValueAsBytes(parkingSpot), XContentType.JSON);
+                .source(objectMapper.writeValueAsBytes(parkingSpot), XContentType.JSON);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
