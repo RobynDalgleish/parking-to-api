@@ -15,3 +15,6 @@ endpoints:
     sensitive: false
   beans:
     sensitive: false
+
+elasticsearch:
+  http-hosts: "http://localhost:9200"
