@@ -14,3 +14,9 @@ jobs:
           java-version: 14
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.6
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: build/test-results/**/*.xml
