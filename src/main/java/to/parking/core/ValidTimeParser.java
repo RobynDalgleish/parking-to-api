@@ -17,7 +17,7 @@ class ValidTimeParser {
 
     // Regular Expression Patterns foor matching
     private static final Pattern twelveHourTimePattern = Pattern.compile("((?:1[0-2]|0[1-9]):[0-5][0-9] (?:am|pm))");
-    private static final Pattern dayOfWeekPattern = Pattern.compile("(Mon|Tues|Wed|Thurs|Fri|Sat|Sun)");
+    private static final Pattern dayOfWeekPattern = Pattern.compile("(Mon|Tue|Wed|Thur|Fri|Sat|Sun)");
     private static final Pattern dayRangePattern = Pattern.compile(dayOfWeekPattern.pattern() + "(?:-" + dayOfWeekPattern.pattern() + ")?");
     private static final Pattern dailyValidTimesPattern = Pattern.compile(
         twelveHourTimePattern.pattern() + "-" + twelveHourTimePattern + ", " + dayRangePattern.pattern()
@@ -39,9 +39,9 @@ class ValidTimeParser {
     ValidTime parse(String input) {
 
         List<DailyValidTimes> dailyValidTimes = new ArrayList<>();
-
         var dailyValidTimesMatcher = dailyValidTimesPattern.matcher(input);
-        if (dailyValidTimesMatcher.matches()) {
+
+        while (dailyValidTimesMatcher.find()) {
             var validHours = new TemporalRange<>(
                 LocalTime.parse(dailyValidTimesMatcher.group(1), twelveHourTimeFormatter),
                 LocalTime.parse(dailyValidTimesMatcher.group(2), twelveHourTimeFormatter)
@@ -54,6 +54,7 @@ class ValidTimeParser {
             var daysOfWeek = EnumSet.range(startDay, endDay);
             dailyValidTimes.add(new DailyValidTimes(daysOfWeek, List.of(validHours)));
         }
+
         return new ValidTime(dailyValidTimes);
     }
 }

@@ -58,6 +58,19 @@ class ValidTimeParserTest {
                         List.of(new TemporalRange<>(LocalTime.of(11, 0), LocalTime.of(14, 0)))
                     )
                 )
+            ),
+            Arguments.of(
+                "09:00 am-10:00 am, Mon-Fri, 11:00 am-12:00 pm, Sat-Sun",
+                List.of(
+                    new DailyValidTimes(
+                        EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY),
+                        List.of(new TemporalRange<>(LocalTime.of(9, 0), LocalTime.of(10, 0)))
+                    ),
+                    new DailyValidTimes(
+                        EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY),
+                        List.of(new TemporalRange<>(LocalTime.of(11, 0), LocalTime.of(12, 0)))
+                    )
+                )
             )
         );
     }
