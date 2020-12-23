@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -62,7 +61,7 @@ class ValidTimeParser {
                 );
             }
 
-            var daysOfWeek = EnumSet.noneOf(DayOfWeek.class);
+            TemporalRange<DayOfWeek> dayRanges = null;
             var dayRangeMatcher = dayRangePattern.matcher(dailyValidTimeString);
             if (dayRangeMatcher.find()) {
 
@@ -71,10 +70,10 @@ class ValidTimeParser {
                 if (dayRangeMatcher.group(2) != null) {
                     endDay = DayOfWeek.from(dayOfWeekFormatter.parse(dayRangeMatcher.group(2)));
                 }
-                daysOfWeek = EnumSet.range(startDay, endDay);
+                dayRanges = new TemporalRange<>(startDay, endDay);
             }
 
-            dailyValidTimes.add(new DailyValidTimes(daysOfWeek, timeRanges));
+            dailyValidTimes.add(new DailyValidTimes(dayRanges, timeRanges));
         }
 
         return dailyValidTimes;

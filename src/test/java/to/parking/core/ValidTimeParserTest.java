@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -45,7 +44,7 @@ class ValidTimeParserTest {
                 "10:00 am-06:00 pm, Mon-Fri",
                 List.of(
                     new DailyValidTimes(
-                        EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY),
+                        new TemporalRange<>(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
                         List.of(new TemporalRange<>(LocalTime.of(10, 0), LocalTime.of(18, 0)))
                     )
                 )
@@ -54,7 +53,7 @@ class ValidTimeParserTest {
                 "11:00 am-02:00 pm, Sat",
                 List.of(
                     new DailyValidTimes(
-                        EnumSet.of(DayOfWeek.SATURDAY),
+                        new TemporalRange<>(DayOfWeek.SATURDAY, DayOfWeek.SATURDAY),
                         List.of(new TemporalRange<>(LocalTime.of(11, 0), LocalTime.of(14, 0)))
                     )
                 )
@@ -63,11 +62,11 @@ class ValidTimeParserTest {
                 "09:00 am-10:00 am, Mon-Fri, 11:00 am-12:00 pm, Sat-Sun",
                 List.of(
                     new DailyValidTimes(
-                        EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY),
+                        new TemporalRange<>(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
                         List.of(new TemporalRange<>(LocalTime.of(9, 0), LocalTime.of(10, 0)))
                     ),
                     new DailyValidTimes(
-                        EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY),
+                        new TemporalRange<>(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY),
                         List.of(new TemporalRange<>(LocalTime.of(11, 0), LocalTime.of(12, 0)))
                     )
                 )
@@ -76,7 +75,7 @@ class ValidTimeParserTest {
                 "08:00 am-09:00 am, 10:00 am-11:00 am, 12:00 pm-01:00 pm, Mon-Fri",
                 List.of(
                     new DailyValidTimes(
-                        EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY),
+                        new TemporalRange<>(DayOfWeek.MONDAY, DayOfWeek.FRIDAY),
                         List.of(
                             new TemporalRange<>(LocalTime.of(8, 0), LocalTime.of(9, 0)),
                             new TemporalRange<>(LocalTime.of(10, 0), LocalTime.of(11, 0)),
