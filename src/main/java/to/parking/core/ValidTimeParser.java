@@ -15,13 +15,12 @@ import java.util.regex.Pattern;
 class ValidTimeParser {
 
 
-    // Regular Expression Patterns foor matching
+    // Regular Expression Patterns for matching
     private static final Pattern twelveHourTimePattern = Pattern.compile("((?:1[0-2]|0[1-9]):[0-5][0-9] (?:am|pm))");
-    private static final Pattern dayOfWeekPattern = Pattern.compile("(Mon|Tue|Wed|Thur|Fri|Sat|Sun)");
-    private static final Pattern dayRangePattern = Pattern.compile(dayOfWeekPattern.pattern() + "(?:-" + dayOfWeekPattern.pattern() + ")?");
-    private static final Pattern dailyValidTimesPattern = Pattern.compile(
-        twelveHourTimePattern.pattern() + "-" + twelveHourTimePattern + ", " + dayRangePattern.pattern()
-    );
+    private static final Pattern timeRangePattern = Pattern.compile(twelveHourTimePattern + "-" + twelveHourTimePattern);
+    private static final Pattern dayOfWeekPattern = Pattern.compile("(Mon|Tue|Wed|Thu|Fri|Sat|Sun)");
+    private static final Pattern dayRangePattern = Pattern.compile(dayOfWeekPattern + "(?:-" + dayOfWeekPattern + ")?");
+    private static final Pattern dailyValidTimesPattern = Pattern.compile(timeRangePattern + "(?:, " + timeRangePattern + ")*, " + dayRangePattern);
 
     // Formatters used for parsing
     private static final DateTimeFormatter twelveHourTimeFormatter = new DateTimeFormatterBuilder()
@@ -38,23 +37,46 @@ class ValidTimeParser {
 
     ValidTime parse(String input) {
 
-        List<DailyValidTimes> dailyValidTimes = new ArrayList<>();
+        return new ValidTime(
+            parseDailyValidTimes(input)
+        );
+    }
+
+    private List<DailyValidTimes> parseDailyValidTimes(String input) {
+
+        var dailyValidTimes = new ArrayList<DailyValidTimes>();
         var dailyValidTimesMatcher = dailyValidTimesPattern.matcher(input);
 
         while (dailyValidTimesMatcher.find()) {
-            var validHours = new TemporalRange<>(
-                LocalTime.parse(dailyValidTimesMatcher.group(1), twelveHourTimeFormatter),
-                LocalTime.parse(dailyValidTimesMatcher.group(2), twelveHourTimeFormatter)
-            );
-            var startDay = DayOfWeek.from(dayOfWeekFormatter.parse(dailyValidTimesMatcher.group(3)));
-            var endDay = startDay;
-            if(dailyValidTimesMatcher.group(4) != null) {
-                endDay = DayOfWeek.from(dayOfWeekFormatter.parse(dailyValidTimesMatcher.group(4)));
+
+            var timeRanges = new ArrayList<TemporalRange<LocalTime>>();
+            var dailyValidTimeString = input.substring(dailyValidTimesMatcher.start(), dailyValidTimesMatcher.end());
+            var timeRangeMatcher = timeRangePattern.matcher(dailyValidTimeString);
+
+            while (timeRangeMatcher.find()) {
+                timeRanges.add(
+                    new TemporalRange<>(
+                        LocalTime.parse(timeRangeMatcher.group(1), twelveHourTimeFormatter),
+                        LocalTime.parse(timeRangeMatcher.group(2), twelveHourTimeFormatter)
+                    )
+                );
             }
-            var daysOfWeek = EnumSet.range(startDay, endDay);
-            dailyValidTimes.add(new DailyValidTimes(daysOfWeek, List.of(validHours)));
+
+            var daysOfWeek = EnumSet.noneOf(DayOfWeek.class);
+            var dayRangeMatcher = dayRangePattern.matcher(dailyValidTimeString);
+            if (dayRangeMatcher.find()) {
+
+                var startDay = DayOfWeek.from(dayOfWeekFormatter.parse(dayRangeMatcher.group(1)));
+                var endDay = startDay;
+                if (dayRangeMatcher.group(2) != null) {
+                    endDay = DayOfWeek.from(dayOfWeekFormatter.parse(dayRangeMatcher.group(2)));
+                }
+                daysOfWeek = EnumSet.range(startDay, endDay);
+            }
+
+            dailyValidTimes.add(new DailyValidTimes(daysOfWeek, timeRanges));
         }
 
-        return new ValidTime(dailyValidTimes);
+        return dailyValidTimes;
     }
 }
