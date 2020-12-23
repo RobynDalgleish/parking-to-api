@@ -2,6 +2,7 @@ package to.parking.elasticsearch;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -40,7 +41,7 @@ class IndexManagerIntegrationTest {
     RestHighLevelClient restHighLevelClient;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         var clock = mock(Clock.class);
         when(clock.time()).thenReturn(OffsetDateTime.parse("2020-11-30T22:11:08Z"));
 
@@ -48,6 +49,8 @@ class IndexManagerIntegrationTest {
             RestClient.builder(
                 new HttpHost(esContainer.getHost(), esContainer.getMappedPort(9200))));
         indexManager = new IndexManager(restHighLevelClient, clock);
+
+        restHighLevelClient.indices().delete(new DeleteIndexRequest("*"), DEFAULT);
     }
 
     @Test
