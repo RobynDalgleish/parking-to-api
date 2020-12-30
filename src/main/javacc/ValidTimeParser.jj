@@ -1,0 +1,128 @@
+options {
+    STATIC = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+}
+
+PARSER_BEGIN(ValidTimeParser)
+
+package to.parking.core.parsing;
+
+import to.parking.core.DailyValidTimes;
+import to.parking.core.TemporalRange;
+import to.parking.core.ValidTime;
+import java.io.StringReader;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ArrayList;
+
+public class ValidTimeParser {
+
+    public static ValidTime parse(String input) {
+        try {
+            return new ValidTimeParser(new StringReader(input)).validTime();
+        } catch(ParseException | TokenMgrError e) {
+            throw new RuntimeException("Invalid valid time.", e);
+        }
+    }
+}
+
+PARSER_END(ValidTimeParser)
+
+private ValidTime validTime() :
+{
+    ValidTime validTime;
+    DailyValidTimes dailyValidTime;
+    List<DailyValidTimes> dailyValidTimes = new ArrayList<>();
+}
+{
+  (dailyValidTime=dailyValidTimes() { dailyValidTimes.add(dailyValidTime); })+ <EOF> { return new ValidTime(dailyValidTimes); }
+}
+
+private DailyValidTimes dailyValidTimes() :
+{
+    List<TemporalRange<LocalTime>> times = new ArrayList<>();
+    TemporalRange<LocalTime> timeRange;
+    TemporalRange<DayOfWeek> dayRange;
+}
+{
+    (timeRange=timeRange() { times.add(timeRange); })+
+    dayRange=dayRange()
+    { return new DailyValidTimes(dayRange, times); }
+}
+
+private TemporalRange<DayOfWeek> dayRange() :
+{
+    DayOfWeek start;
+    DayOfWeek end = null;
+}
+{
+    start=dayOfWeek() ("-"end=dayOfWeek())? {
+        return new TemporalRange<>(start, end == null ? start : end);
+    }
+}
+
+private DayOfWeek dayOfWeek() :
+{
+    Token dayOfWeek;
+}
+{
+    dayOfWeek=<DAY_OF_WEEK> {
+        switch(dayOfWeek.image) {
+            case "Mon": return DayOfWeek.MONDAY;
+            case "Tue": return DayOfWeek.TUESDAY;
+            case "Wed": return DayOfWeek.WEDNESDAY;
+            case "Thu": return DayOfWeek.THURSDAY;
+            case "Fri": return DayOfWeek.FRIDAY;
+            case "Sat": return DayOfWeek.SATURDAY;
+            case "Sun": return DayOfWeek.SUNDAY;
+        }
+    }
+}
+
+private TemporalRange<LocalTime> timeRange() :
+{
+    LocalTime start;
+    LocalTime end;
+}
+{
+    start=time() "-" end=time() {
+        return new TemporalRange<>(start, end);
+    }
+}
+
+private LocalTime time() :
+{
+    Token hourToken;
+    Token minuteToken;
+    Token periodToken;
+}
+{
+    hourToken=<HOUR_OF_DAY> ":" minuteToken=<MINUTE_OF_DAY> periodToken=<PERIOD> {
+        int hour = Integer.parseInt(hourToken.image, 10);
+        int minute = Integer.parseInt(minuteToken.image, 10);
+        if (hour < 12 && "pm".equals(periodToken.image)) {
+            hour += 12;
+        } else if (hour == 12 && "am".equals(periodToken.image)) {
+            hour = 0;
+        }
+        return LocalTime.of(hour, minute);
+    }
+}
+
+SKIP :
+{
+        " "
+    |   ","
+    |   "\t"
+    |   "\r"
+    |   "\n"
+}
+
+TOKEN : {
+        <HOUR_OF_DAY: "1"["0"-"2"] | "0"["1"-"9"]>
+    |   <MINUTE_OF_DAY: ["0"-"5"]["0"-"9"]>
+    |   <PERIOD: "am" | "pm">
+    |   <DAY_OF_WEEK: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun">
+}
