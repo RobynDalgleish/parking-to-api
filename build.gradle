@@ -1,6 +1,7 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("io.micronaut.application") version "1.2.0"
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "io.micronaut.application" version "1.2.0"
+    id "com.intershop.gradle.javacc" version "4.0.0"
 }
 
 version = "0.1.0"
@@ -63,5 +64,15 @@ java {
 processResources {
     filesMatching("**/**.yml") {
         expand(project.properties)
+    }
+}
+
+javacc {
+    javaCCVersion = '7.0.5'
+    configs {
+        validTimeParser {
+            inputFile = file('src/main/javacc/ValidTimeParser.jj')
+            packageName = 'to.parking.core.parsing'
+        }
     }
 }

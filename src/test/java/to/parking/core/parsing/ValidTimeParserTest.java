@@ -1,11 +1,13 @@
-package to.parking.core;
+package to.parking.core.parsing;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import to.parking.core.DailyValidTimes;
+import to.parking.core.TemporalRange;
+import to.parking.core.ValidTime;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -18,19 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("ValidTimeParser Tests")
 class ValidTimeParserTest {
 
-    private ValidTimeParser validTimeParser;
-
-    @BeforeEach
-    void setUp() {
-        validTimeParser = new ValidTimeParser();
-    }
-
     @ParameterizedTest(name = "Can parse ''{0}''")
     @MethodSource("parsesDailyValidTimesCorrectlyArguments")
     @DisplayName("Parses daily valid times correctly")
     void parsesDailyValidTimesCorrectly(String input, List<DailyValidTimes> expected) {
 
-        var validTime = validTimeParser.parse(input);
+        var validTime = ValidTimeParser.parse(input);
 
         assertThat(validTime)
             .isNotNull()
