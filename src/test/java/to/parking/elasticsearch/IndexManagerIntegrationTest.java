@@ -1,21 +1,17 @@
 package to.parking.elasticsearch;
 
-import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.testcontainers.junit.jupiter.Container;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import to.parking.app.Clock;
+import to.parking.utils.ElasticsearchExtension;
 
 import java.time.OffsetDateTime;
 
@@ -32,25 +28,19 @@ import static org.mockito.Mockito.when;
 @TestInstance(PER_CLASS)
 class IndexManagerIntegrationTest {
 
-    @Container
-    // TODO: expose a random port; right now its set to a 9200/9300 default
-    private static final ElasticsearchContainer esContainer = new ElasticsearchContainer(
-        DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch").withTag("7.9.3")
-    ).withExposedPorts(9200);
-    IndexManager indexManager;
+    @RegisterExtension
+    final ElasticsearchExtension elasticsearchExtension = new ElasticsearchExtension();
+
     RestHighLevelClient restHighLevelClient;
+    IndexManager indexManager;
 
     @BeforeEach
     public void setUp() throws Exception {
         var clock = mock(Clock.class);
         when(clock.time()).thenReturn(OffsetDateTime.parse("2020-11-30T22:11:08Z"));
 
-        restHighLevelClient = new RestHighLevelClient(
-            RestClient.builder(
-                new HttpHost(esContainer.getHost(), esContainer.getMappedPort(9200))));
+        restHighLevelClient = elasticsearchExtension.getRestHighLevelClient();
         indexManager = new IndexManager(restHighLevelClient, clock);
-
-        restHighLevelClient.indices().delete(new DeleteIndexRequest("*"), DEFAULT);
     }
 
     @Test
