@@ -1,0 +1,30 @@
+[
+  {
+    "id": 465,
+    "streetName": "Broadview Avenue",
+    "streetSideCardinal": "West",
+    "streetSegment": "Dundas Street East and Simpson Avenue",
+    "validTime": "9:00 a.m. to 6:00 p.m., Mon. to Fri.; 8:00 a.m. to 6:00 p.m., Sat.",
+    "permittedTime": "1 hour",
+    "permittedDuration": 3600.0,
+    "startZone": "dundas street east ",
+    "endZone": " simpson avenue",
+    "cleanValidTime": "09:00 am-06:00 pm, Mon-Fri, 08:00 am-06:00 pm, Sat",
+    "anytimeWeekend": false,
+    "exception": false
+  },
+  {
+    "id": 1668,
+    "streetName": "Howard Park Avenue",
+    "streetSideCardinal": "South",
+    "streetSegment": "Roncesvalles Avenue and Dundas Street West",
+    "validTime": "8:00 a.m. to 6:00 p.m., Mon. to Fri.; 8:00 a.m. to 6:00 p.m., Sat.",
+    "permittedTime": "1 hour",
+    "permittedDuration": 3600.0,
+    "startZone": "roncesvalles avenue ",
+    "endZone": " dundas street west",
+    "cleanValidTime": "08:00 am-06:00 pm, Mon-Fri, 08:00 am-06:00 pm, Sat",
+    "anytimeWeekend": false,
+    "exception": false
+  }
+]

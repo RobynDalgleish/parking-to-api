@@ -1,0 +1,3 @@
+,ID,street,park_side,area_between,valid_time,permited_time,permited_time_mins,start_zone,end_zone,clean,anytime_weekend,exception
+331,465,Broadview Avenue,West,Dundas Street East and Simpson Avenue,"9:00 a.m. to 6:00 p.m., Mon. to Fri.; 8:00 a.m. to 6:00 p.m., Sat.",1 hour,60,dundas street east , simpson avenue,"09:00 am-06:00 pm, Mon-Fri, 08:00 am-06:00 pm, Sat",0,0
+1243,1668,Howard Park Avenue,South,Roncesvalles Avenue and Dundas Street West,"8:00 a.m. to 6:00 p.m., Mon. to Fri.; 8:00 a.m. to 6:00 p.m., Sat.",1 hour,60,roncesvalles avenue , dundas street west,"08:00 am-06:00 pm, Mon-Fri, 08:00 am-06:00 pm, Sat",0,0
