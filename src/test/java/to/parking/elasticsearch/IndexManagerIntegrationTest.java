@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import to.parking.app.Clock;
 import to.parking.utils.ElasticsearchExtension;
 
@@ -24,8 +23,8 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Testcontainers
 @TestInstance(PER_CLASS)
+@DisplayName("IndexManager Integration Tests")
 class IndexManagerIntegrationTest {
 
     @RegisterExtension
@@ -36,6 +35,7 @@ class IndexManagerIntegrationTest {
 
     @BeforeEach
     public void setUp() throws Exception {
+
         var clock = mock(Clock.class);
         when(clock.time()).thenReturn(OffsetDateTime.parse("2020-11-30T22:11:08Z"));
 
@@ -46,9 +46,12 @@ class IndexManagerIntegrationTest {
     @Test
     @DisplayName("A new index is created with appropriate settings")
     public void indexIsCreatedWithAppropriateSettings() throws Exception {
+
         var indexName = indexManager.createNewIndex();
         var settingRequest = new GetSettingsRequest().indices(indexName);
+
         Settings settings = restHighLevelClient.indices().getSettings(settingRequest, DEFAULT).getIndexToSettings().get(indexName);
+
         assertThat(settings.get("index.number_of_shards")).isEqualTo("1");
         assertThat(settings.get("index.number_of_replicas")).isEqualTo("0");
         assertThat(settings.get("index.refresh_interval")).isEqualTo("-1");
@@ -57,7 +60,9 @@ class IndexManagerIntegrationTest {
     @Test
     @DisplayName("Creates predictable unique index name")
     public void createsPredictableUniqueIndexName() throws Exception {
+
         var indexName = indexManager.createNewIndex();
+
         assertThat(indexName).isEqualTo("to-parking-20201130221108");
     }
 

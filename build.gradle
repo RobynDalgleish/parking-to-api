@@ -52,7 +52,6 @@ dependencies {
     )
     testImplementation(
             "org.testcontainers:testcontainers:1.15.0",
-            "org.testcontainers:junit-jupiter:1.15.0",
             "org.testcontainers:elasticsearch:1.15.0",
             "org.assertj:assertj-core:3.9.0",
             "org.junit.jupiter:junit-jupiter-params",

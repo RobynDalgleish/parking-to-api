@@ -38,9 +38,7 @@ public class ElasticsearchExtension implements BeforeAllCallback, BeforeEachCall
     public void beforeAll(ExtensionContext context) {
         elasticsearchContainer.start();
         restHighLevelClient = new RestHighLevelClient(
-            RestClient.builder(
-                new HttpHost(elasticsearchContainer.getHost(), elasticsearchContainer.getMappedPort(9200))
-            )
+            RestClient.builder(HttpHost.create(elasticsearchContainer.getHttpHostAddress()))
         );
     }
 

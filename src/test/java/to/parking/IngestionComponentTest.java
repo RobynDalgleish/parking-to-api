@@ -4,11 +4,11 @@ import io.micronaut.http.HttpStatus;
 import org.elasticsearch.search.SearchHit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import to.parking.ComponentTest;
 import to.parking.fixture.ParkingDataFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("Ingestion Component Tests")
 class IngestionComponentTest extends ComponentTest {
 
     @Test
