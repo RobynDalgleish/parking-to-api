@@ -1,6 +1,7 @@
 package to.parking.core.parsing;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("ValidTimeParser Tests")
@@ -80,5 +82,29 @@ class ValidTimeParserTest {
                 )
             )
         );
+    }
+
+    @ParameterizedTest(name = "Can parse ''{0}''")
+    @MethodSource("parsesAnytimeCorrectlyArguments")
+    @DisplayName("Parses anytime correctly")
+    void parsesAnytimeCorrectly(String input, Boolean isAnytime) {
+
+        var validTime = ValidTimeParser.parse(input);
+
+        assertThat(validTime).isNotNull();
+        assertThat(validTime.getAnytime()).isEqualTo(isAnytime);
+    }
+
+    static Stream<Arguments> parsesAnytimeCorrectlyArguments() {
+        return Stream.of(
+            Arguments.of("10:00 am-06:00 pm, Mon-Fri", false),
+            Arguments.of("Anytime", true)
+        );
+    }
+
+    @Test
+    @DisplayName("Parses empty")
+    void parsesEmptyCorrectly() {
+        assertThatThrownBy(() -> ValidTimeParser.parse("")).isInstanceOf(RuntimeException.class).hasMessage("Invalid valid time.");
     }
 }

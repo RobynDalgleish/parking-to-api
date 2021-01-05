@@ -35,9 +35,15 @@ private ValidTime validTime() :
     ValidTime validTime;
     DailyValidTimes dailyValidTime;
     List<DailyValidTimes> dailyValidTimes = new ArrayList<>();
+    boolean anytime = false;
 }
 {
-  (dailyValidTime=dailyValidTimes() { dailyValidTimes.add(dailyValidTime); })+ <EOF> { return new ValidTime(dailyValidTimes); }
+  ((dailyValidTime=dailyValidTimes() { dailyValidTimes.add(dailyValidTime); })+
+  | <ANYTIME> { anytime = true; })
+  <EOF>
+  {
+    return new ValidTime(dailyValidTimes, anytime);
+  }
 }
 
 private DailyValidTimes dailyValidTimes() :
@@ -125,4 +131,5 @@ TOKEN : {
     |   <MINUTE_OF_DAY: ["0"-"5"]["0"-"9"]>
     |   <PERIOD: "am" | "pm">
     |   <DAY_OF_WEEK: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun">
+    |   <ANYTIME: "Anytime">
 }

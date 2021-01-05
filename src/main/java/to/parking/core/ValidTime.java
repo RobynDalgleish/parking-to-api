@@ -8,4 +8,5 @@ import java.util.List;
 public class ValidTime {
 
     List<DailyValidTimes> dailyValidTimes;
+    Boolean anytime;
 }
